@@ -2,6 +2,7 @@ package com.example.kamranali.campusrecruitmentsystem.ui;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,12 +11,15 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.kamranali.campusrecruitmentsystem.R;
 import com.example.kamranali.campusrecruitmentsystem.model.Model;
+import com.example.kamranali.campusrecruitmentsystem.utils.AppLog;
 import com.example.kamranali.campusrecruitmentsystem.utils.Constants;
 import com.example.kamranali.campusrecruitmentsystem.utils.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +34,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * A simple {@link Fragment} subclass.
  */
 public class SignupFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "SignupFragment";
     View view;
     EditText editTextEmail, editTextUserDob, editTexttName, editTextPassword, editTextGender;
     String userEmail, userDOB, userPassword, userGender, userName;
@@ -38,6 +43,8 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     private ProgressDialog progressDialog;
     private DatabaseReference databastRef;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private Spinner selectionSpinner;
+    private InputMethodManager imm;
     public SignupFragment() {
         // Required empty public constructor
     }
@@ -47,6 +54,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_signup, container, false);
+         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
         initViews();
 
@@ -63,8 +71,10 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
         editTextPassword = (EditText) view.findViewById(R.id.signup_passwordView);
         editTextGender = (EditText) view.findViewById(R.id.signup_GenderView);
         signupButton = (Button) view.findViewById(R.id.signup_Button);
+        selectionSpinner = (Spinner) view.findViewById(R.id.selection_spinner);
         signupButton.setOnClickListener(this);
         addFocusListeners();
+
     }
 
     private void addFocusListeners() {
@@ -111,13 +121,24 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
                 if (authResultTask.isSuccessful()){
                     final String uid = authResultTask.getResult().getUser().getUid();
-                    databastRef.child(Constants.admin).child(uid).setValue(new Model(userName,userEmail,userPassword,userDOB,userGender,uid));
-                    getActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.activity_main,new LoginFargment())
-                            .addToBackStack(null)
-                            .commit();
-                    getActivity().finish();
-                    progressDialog.dismiss();
+                    if (selectionSpinner.getSelectedItem().toString().equals("Signup as a Student")){
+                        databastRef.child(Constants.STUDENT).child(uid).setValue(new Model(userName,userEmail,userPassword,userDOB,userGender,uid));
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.activity_main,new LoginFargment())
+                                .addToBackStack(null)
+                                .commit();
+                        progressDialog.dismiss();
+                    }else {
+                        databastRef.child(Constants.COMPANY).child(uid).setValue(new Model(userName,userEmail,userPassword,userDOB,userGender,uid));
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.activity_main,new LoginFargment())
+                                .addToBackStack(null)
+                                .commit();
+                        progressDialog.dismiss();
+
+                    }
+
+
                 }else {
                     Util.failureToast(getActivity(),"sigUP failed");
                     progressDialog.dismiss();
@@ -133,6 +154,12 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
         });
 
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
     }
 
     @Override
