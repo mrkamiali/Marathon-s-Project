@@ -18,8 +18,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.kamranali.campusrecruitmentsystem.R;
+import com.example.kamranali.campusrecruitmentsystem.utils.AppLog;
 import com.example.kamranali.campusrecruitmentsystem.utils.Constants;
-import com.example.kamranali.campusrecruitmentsystem.utils.Util;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -38,6 +38,7 @@ public class LoginFargment extends Fragment {
     private FirebaseUser current_user;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private SharedPreferences sharedPreferences;
+    private Menu menu;
 
 
     public LoginFargment() {
@@ -107,7 +108,15 @@ public class LoginFargment extends Fragment {
                 beginTranscartion(new SigninFragment(), company);
             }
         });
+
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.setMenu(R.menu.login_action_menu);
     }
 
     private void checkwhosSigninLast(String user, String uid) {
@@ -117,12 +126,10 @@ public class LoginFargment extends Fragment {
         }else if (user.equals(Constants.COMPANY)){
             getActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.activity_main,new CompanyFragment())
-                    .addToBackStack(null)
                     .commit();
         }else {
             getActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.activity_main,new StudentFragment())
-                    .addToBackStack(null)
                     .commit();
         }
     }
@@ -161,16 +168,23 @@ public class LoginFargment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        AppLog.logd("onOptionsItemsSelected(menuItem); - > LoginFragment");
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        //this.menu = menu;
+        //menu.setGroupVisible(R.id.login_complete,false);
+        AppLog.logd("onPrepareOptionsMenu(menu); - > LoginFragment");
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu,inflater);
+        AppLog.logd("onCreateOptionsMenu(menu,inflater); - > LoginFragment");
 
     }
 }

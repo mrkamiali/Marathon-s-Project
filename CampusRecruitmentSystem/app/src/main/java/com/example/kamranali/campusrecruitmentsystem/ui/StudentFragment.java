@@ -13,13 +13,16 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 
 import com.example.kamranali.campusrecruitmentsystem.R;
+import com.example.kamranali.campusrecruitmentsystem.utils.AppLog;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class StudentFragment extends Fragment {
 
-    private InputMethodManager imm ;
+    private InputMethodManager imm;
+    private View view;
+
     public StudentFragment() {
         // Required empty public constructor
     }
@@ -29,27 +32,38 @@ public class StudentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_student, container, false);
+        view = inflater.inflate(R.layout.fragment_student, container, false);
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
-
-
+        ((MainActivity) getActivity()).setMenu(R.menu.student_action_menu);
 
         return view;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        AppLog.logd("onOptionsItemSelected(item); - > Student Fragment");
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        AppLog.logd("onPrepareOptionsMenu(menu); - > Student Fragment");
+
         super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().getMenuInflater().inflate(R.menu.action_menu,menu);
+        //   inflater.inflate(R.menu.student_action_menu,menu);
+        inflater.inflate(R.menu.student_action_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+        AppLog.logd("onCreateOptionsMenu(menu,inflater); - > Student Fragment");
     }
 }
 

@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.kamranali.campusrecruitmentsystem.R;
-import com.example.kamranali.campusrecruitmentsystem.utils.AppLog;
 import com.example.kamranali.campusrecruitmentsystem.utils.Constants;
 import com.example.kamranali.campusrecruitmentsystem.utils.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -107,7 +106,7 @@ public class SigninFragment extends Fragment {
 //                            checkforSignin(fromExtras, email, pasword);
 //                            progressDialog.dismiss();
 //                        }
-                            checksignfor(fromExtras,email,pasword);
+                        checksignfor(fromExtras, email, pasword);
                     } else {
                         String email = email_signin.getText().toString();
                         String pasword = email_password.getText().toString();
@@ -123,34 +122,40 @@ public class SigninFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
     private void checksignfor(final String fromExtras, String email, String pasword) {
-        mAuth.signInWithEmailAndPassword(email,pasword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email, pasword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressDialog.dismiss();
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
                     final String uid = task.getResult().getUser().getUid();
                     FirebaseDatabase.getInstance().getReference().child(fromExtras).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (dataSnapshot!=null){
-                                for (DataSnapshot data:dataSnapshot.getChildren()) {
+                            if (dataSnapshot != null) {
+                                for (DataSnapshot data : dataSnapshot.getChildren()) {
                                     if (data.getKey().equals(uid)) {
                                         if (fromExtras.equals(Constants.STUDENT)) {
                                             editor.clear();
-                                            editor.putString(Constants.SharedKEY,fromExtras);
+                                            editor.putString(Constants.SharedKEY, fromExtras);
                                             editor.commit();
+                                            getActivity().getSupportFragmentManager().popBackStack();
                                             getActivity().getSupportFragmentManager().beginTransaction()
                                                     .replace(R.id.activity_main, new StudentFragment())
-                                                    .addToBackStack(null)
                                                     .commit();
                                         } else if (fromExtras.equals(Constants.COMPANY)) {
                                             editor.clear();
-                                            editor.putString(Constants.SharedKEY,fromExtras);
+                                            editor.putString(Constants.SharedKEY, fromExtras);
                                             editor.commit();
+                                            getActivity().getSupportFragmentManager().popBackStack();
                                             getActivity().getSupportFragmentManager().beginTransaction()
                                                     .replace(R.id.activity_main, new CompanyFragment())
-                                                    .addToBackStack(null)
                                                     .commit();
                                         } else {
                                             Util.successToast(getActivity(), "This is an Admin Account, You can not access it.");
@@ -168,7 +173,7 @@ public class SigninFragment extends Fragment {
                         }
                     });
                 } else {
-                    Util.failureToast(getActivity(),"User not Found");
+                    Util.failureToast(getActivity(), "User not Found");
                 }
 
             }
@@ -296,11 +301,11 @@ public class SigninFragment extends Fragment {
                             FirebaseDatabase.getInstance().getReference().child(Constants.ADMIN).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot data : dataSnapshot.getChildren()){
-                                        if (data.getKey().equals(uid)){
+                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                        if (data.getKey().equals(uid)) {
                                             Util.successToast(getActivity(), "Sign-in Successfully");
                                             editor.clear();
-                                            editor.putString(Constants.SharedKEY,Constants.ADMIN);
+                                            editor.putString(Constants.SharedKEY, Constants.ADMIN);
                                             editor.commit();
                                             Intent intent = new Intent(getActivity(), AdminActivity.class);
                                             startActivity(intent);
@@ -333,6 +338,7 @@ public class SigninFragment extends Fragment {
 
         //
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -359,6 +365,5 @@ public class SigninFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
     }
 }

@@ -5,6 +5,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="setting">Setting</string>
+    <string name="logout">Logout</string>
     <string-array name="signupSelection">
         <item>Signup as a Student</item>
         <item>Signup as a Company</item>
