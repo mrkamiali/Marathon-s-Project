@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Campus Recruitment System</string>
+    <string name="develope_by">Developed By</string>
+    <string name="campus_heading">Campus Recuirtment System</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="signupSelection">
+        <item>Signup as a Student</item>
+        <item>Signup as a Company</item>
+    </string-array>
+</resources>

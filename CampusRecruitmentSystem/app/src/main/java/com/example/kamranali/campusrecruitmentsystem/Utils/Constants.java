@@ -6,11 +6,9 @@ package com.example.kamranali.campusrecruitmentsystem.utils;
 
 public class Constants {
     public static final String STUDENT = "student";
-    public static final String COMPANY = "Company";
-    public static String admin= "admin";
-    private static String userProfile= "userprofile";
-public static String getUserProfile() {
-    return userProfile;
-}public static void setUserProfile(String userProfile) {
-    Constants.userProfile = userProfile;
-}}
+    public static final String COMPANY = "company";
+    public static final String EMAIL = "email";
+    public static String ADMIN = "admin";
+    public static String userProfile = "userprofile";
+
+}

@@ -3,6 +3,7 @@ package com.example.kamranali.campusrecruitmentsystem.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.example.kamranali.campusrecruitmentsystem.R;
 import com.example.kamranali.campusrecruitmentsystem.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -27,6 +29,8 @@ public class LoginFargment extends Fragment {
     private InputMethodManager imm;
     private View view;
     private FirebaseAuth mAuth;
+    private FirebaseUser current_user;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
 
     public LoginFargment() {
@@ -42,6 +46,20 @@ public class LoginFargment extends Fragment {
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         mAuth = FirebaseAuth.getInstance();
+        current_user = mAuth.getCurrentUser();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                if (currentUser!=null){
+                    //User is signin
+                }else {
+                    //User is signout
+                }
+
+            }
+        };
+
         // Inflate the layout for this fragment
         firebaseDatabase = FirebaseDatabase.getInstance().getReference();
         studentLogin = (Button) view.findViewById(R.id.student_login);
@@ -58,7 +76,7 @@ public class LoginFargment extends Fragment {
         studentLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String student = "student";
+                String student = Constants.STUDENT;
                 beginTranscartion(new SigninFragment(), student);
             }
         });
@@ -71,7 +89,7 @@ public class LoginFargment extends Fragment {
         companyLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String company = "company";
+                String company = Constants.COMPANY;
                 beginTranscartion(new SigninFragment(), company);
             }
         });
@@ -80,7 +98,7 @@ public class LoginFargment extends Fragment {
 
     private void beginTranscartion(Fragment fragment, String data) {
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.getUserProfile(), data);
+        bundle.putString(Constants.userProfile, data);
         fragment.setArguments(bundle);
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
@@ -100,6 +118,15 @@ public class LoginFargment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
+        mAuth.addAuthStateListener(mAuthListener);
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
 }
