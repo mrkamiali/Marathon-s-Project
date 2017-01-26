@@ -1,11 +1,13 @@
 package com.example.kamranali.campusrecruitmentsystem.ui;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import com.example.kamranali.campusrecruitmentsystem.R;
 
@@ -14,6 +16,8 @@ import com.example.kamranali.campusrecruitmentsystem.R;
  */
 public class CompanyFragment extends Fragment {
 
+    private InputMethodManager imm;
+    private View view;
 
     public CompanyFragment() {
         // Required empty public constructor
@@ -24,7 +28,8 @@ public class CompanyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_company, container, false);
+        view =  inflater.inflate(R.layout.fragment_company, container, false);
+        imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
 
 
@@ -32,5 +37,15 @@ public class CompanyFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
 
+    @Override
+    public void onResume() {
+        imm.hideSoftInputFromInputMethod(view.getWindowToken(),0);
+        ((MainActivity)getActivity()).setMenu(R.menu.action_menu);
+        super.onResume();
+    }
 }

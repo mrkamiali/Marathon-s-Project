@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (menuRes) {
-            case R.menu.student_action_menu:
+            case R.menu.action_menu:
                 switch (item.getItemId()) {
                     case R.id.logout:
                         Util.successToast(this, "Logout");

@@ -34,7 +34,6 @@ public class StudentFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_student, container, false);
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        ((MainActivity) getActivity()).setMenu(R.menu.student_action_menu);
 
         return view;
     }
@@ -42,28 +41,13 @@ public class StudentFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+    }
+
+    @Override
+    public void onResume() {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        AppLog.logd("onOptionsItemSelected(item); - > Student Fragment");
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        AppLog.logd("onPrepareOptionsMenu(menu); - > Student Fragment");
-
-        super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //   inflater.inflate(R.menu.student_action_menu,menu);
-        inflater.inflate(R.menu.student_action_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-        AppLog.logd("onCreateOptionsMenu(menu,inflater); - > Student Fragment");
+        ((MainActivity) getActivity()).setMenu(R.menu.action_menu);
+        super.onResume();
     }
 }
 
