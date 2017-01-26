@@ -31,9 +31,6 @@ public class CompanyFragment extends Fragment {
         view =  inflater.inflate(R.layout.fragment_company, container, false);
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-
-
-
         return view;
     }
 
@@ -44,7 +41,7 @@ public class CompanyFragment extends Fragment {
 
     @Override
     public void onResume() {
-        imm.hideSoftInputFromInputMethod(view.getWindowToken(),0);
+        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
         ((MainActivity)getActivity()).setMenu(R.menu.action_menu);
         super.onResume();
     }

@@ -52,7 +52,6 @@ public class LoginFargment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_login_fargment, container, false);
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         mAuth = FirebaseAuth.getInstance();
         current_user = mAuth.getCurrentUser();
         sharedPreferences = getActivity().getSharedPreferences(Constants.SHARED_PREFEREBCES,Context.MODE_PRIVATE);
@@ -115,6 +114,7 @@ public class LoginFargment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
         MainActivity mainActivity = (MainActivity) getActivity();
         mainActivity.setMenu(R.menu.login_action_menu);
     }
