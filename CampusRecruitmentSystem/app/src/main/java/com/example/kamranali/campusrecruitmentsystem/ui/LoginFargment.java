@@ -2,10 +2,15 @@ package com.example.kamranali.campusrecruitmentsystem.ui;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -14,6 +19,7 @@ import android.widget.TextView;
 
 import com.example.kamranali.campusrecruitmentsystem.R;
 import com.example.kamranali.campusrecruitmentsystem.utils.Constants;
+import com.example.kamranali.campusrecruitmentsystem.utils.Util;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +37,7 @@ public class LoginFargment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser current_user;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private SharedPreferences sharedPreferences;
 
 
     public LoginFargment() {
@@ -47,12 +54,19 @@ public class LoginFargment extends Fragment {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         mAuth = FirebaseAuth.getInstance();
         current_user = mAuth.getCurrentUser();
+        sharedPreferences = getActivity().getSharedPreferences(Constants.SHARED_PREFEREBCES,Context.MODE_PRIVATE);
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
                 if (currentUser!=null){
+                    String user = sharedPreferences.getString(Constants.SharedKEY, null);
                     //User is signin
+                    String uid = currentUser.getUid();
+
+                    checkwhosSigninLast(user,uid);
+
                 }else {
                     //User is signout
                 }
@@ -96,6 +110,23 @@ public class LoginFargment extends Fragment {
         return view;
     }
 
+    private void checkwhosSigninLast(String user, String uid) {
+        if (user.equals(Constants.ADMIN)){
+            Intent intent = new Intent(getActivity(),AdminActivity.class);
+            startActivity(intent);
+        }else if (user.equals(Constants.COMPANY)){
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.activity_main,new CompanyFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }else {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.activity_main,new StudentFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+
     private void beginTranscartion(Fragment fragment, String data) {
         Bundle bundle = new Bundle();
         bundle.putString(Constants.userProfile, data);
@@ -110,7 +141,6 @@ public class LoginFargment extends Fragment {
     private void beginTranscartion(Fragment fragment) {
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.activity_main, fragment)
-
                 .addToBackStack(null)
                 .commit();
     }
@@ -129,4 +159,18 @@ public class LoginFargment extends Fragment {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+    }
 }

@@ -2,11 +2,17 @@ package com.example.kamranali.campusrecruitmentsystem.ui;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,6 +27,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,10 +42,13 @@ public class SigninFragment extends Fragment {
     private EditText email_signin, email_password;
     private Button signinButton;
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference databaseReference;
     private Bundle extras;
     private boolean checkforStudentCompany;
     private ProgressDialog progressDialog;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     public SigninFragment() {
         // Required empty public constructor
@@ -52,12 +62,28 @@ public class SigninFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_signin, container, false);
         mAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        sharedPreferences = getActivity().getSharedPreferences(Constants.SHARED_PREFEREBCES, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         extras = getArguments();
 
         email_signin = (EditText) view.findViewById(R.id.email_signinView);
         email_password = (EditText) view.findViewById(R.id.email_passwordView);
         signinButton = (Button) view.findViewById(R.id.signin_Button);
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
         signinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +107,6 @@ public class SigninFragment extends Fragment {
 //                            checkforSignin(fromExtras, email, pasword);
 //                            progressDialog.dismiss();
 //                        }
-
                             checksignfor(fromExtras,email,pasword);
                     } else {
                         String email = email_signin.getText().toString();
@@ -112,11 +137,17 @@ public class SigninFragment extends Fragment {
                                 for (DataSnapshot data:dataSnapshot.getChildren()) {
                                     if (data.getKey().equals(uid)) {
                                         if (fromExtras.equals(Constants.STUDENT)) {
+                                            editor.clear();
+                                            editor.putString(Constants.SharedKEY,fromExtras);
+                                            editor.commit();
                                             getActivity().getSupportFragmentManager().beginTransaction()
                                                     .replace(R.id.activity_main, new StudentFragment())
                                                     .addToBackStack(null)
                                                     .commit();
                                         } else if (fromExtras.equals(Constants.COMPANY)) {
+                                            editor.clear();
+                                            editor.putString(Constants.SharedKEY,fromExtras);
+                                            editor.commit();
                                             getActivity().getSupportFragmentManager().beginTransaction()
                                                     .replace(R.id.activity_main, new CompanyFragment())
                                                     .addToBackStack(null)
@@ -268,6 +299,9 @@ public class SigninFragment extends Fragment {
                                     for (DataSnapshot data : dataSnapshot.getChildren()){
                                         if (data.getKey().equals(uid)){
                                             Util.successToast(getActivity(), "Sign-in Successfully");
+                                            editor.clear();
+                                            editor.putString(Constants.SharedKEY,Constants.ADMIN);
+                                            editor.commit();
                                             Intent intent = new Intent(getActivity(), AdminActivity.class);
                                             startActivity(intent);
                                         }
@@ -299,6 +333,32 @@ public class SigninFragment extends Fragment {
 
         //
     }
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
 
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+    }
 }
